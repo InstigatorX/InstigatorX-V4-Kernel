@@ -39,6 +39,7 @@ static const struct usb_device_id id_table[] = {
 	{USB_DEVICE(0x19d2, 0xfff3)},	/* ONDA Gobi Modem device */
 	{USB_DEVICE(0x19d2, 0xfff2)},	/* ONDA Gobi QDL device */
 	{USB_DEVICE(0x1557, 0x0a80)},	/* OQO Gobi QDL device */
+	{USB_DEVICE(0x05c6, 0x9001)},   /* Generic Gobi Modem device */
 	{USB_DEVICE(0x05c6, 0x9002)},	/* Generic Gobi Modem device */
 	{USB_DEVICE(0x05c6, 0x9202)},	/* Generic Gobi Modem device */
 	{USB_DEVICE(0x05c6, 0x9203)},	/* Generic Gobi Modem device */
@@ -82,7 +83,7 @@ static const struct usb_device_id id_table[] = {
 	{USB_DEVICE(0x16d8, 0x8002)},	/* CMDTech Gobi 2000 Modem device (VU922) */
 	{USB_DEVICE(0x05c6, 0x9204)},	/* Gobi 2000 QDL device */
 	{USB_DEVICE(0x05c6, 0x9205)},	/* Gobi 2000 Modem device */
-	{USB_DEVICE(0x05c6, 0x9048)},
+	{USB_DEVICE(0x1199, 0x9013)},	/* Sierra Wireless Gobi 3000 Modem device (MC8355) */
 	{ }				/* Terminating entry */
 };
 MODULE_DEVICE_TABLE(usb, id_table);
