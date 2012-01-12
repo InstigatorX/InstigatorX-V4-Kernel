@@ -2531,6 +2531,15 @@ static void pch_udc_dev_isr(struct pch_udc_dev *dev, u32 dev_intr)
 			dev->driver->suspend(&dev->gadget);
 			spin_lock(&dev->lock);
 		}
+
+		if (dev->vbus_session == 0) {
+			if (dev->driver && dev->driver->disconnect) {
+				spin_unlock(&dev->lock);
+				dev->driver->disconnect(&dev->gadget);
+				spin_lock(&dev->lock);
+			}
+			pch_udc_reconnect(dev);
+		}
 		dev_dbg(&dev->pdev->dev, "USB_SUSPEND\n");
 	}
 	/* Clear the SOF interrupt, if enabled */
