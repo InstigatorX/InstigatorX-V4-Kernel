@@ -476,6 +476,7 @@ do_cache_op(unsigned long start, unsigned long end, int flags)
 		if (end > vma->vm_end)
 			end = vma->vm_end;
 
+<<<<<<< HEAD
 		up_read(&mm->mmap_sem);
 		flush_cache_user_range(start, end);
 
@@ -483,6 +484,9 @@ do_cache_op(unsigned long start, unsigned long end, int flags)
 		mb();
 #endif
 		return;
+=======
+		flush_cache_user_range(start, end);
+>>>>>>> 866cd76... ARM: 7365/1: drop unused parameter from flush_cache_user_range
 	}
 	up_read(&mm->mmap_sem);
 }
