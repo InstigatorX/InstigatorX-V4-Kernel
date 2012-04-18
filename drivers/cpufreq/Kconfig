@@ -161,6 +161,25 @@ config CPU_FREQ_DEFAULT_GOV_HOTPLUG
 	  the help section of the driver. Fallback governor will be the
 	  performance governor.
 
+config CPU_FREQ_DEFAULT_GOV_SAVAGEDZEN
+	bool "savagedzen"
+	select CPU_FREQ_GOV_SAVAGEDZEN
+	help
+	  Use the CPUFreq governor 'savagedzen' as default.
+
+config CPU_FREQ_DEFAULT_GOV_SMOOTHASS
+	bool "smoothass"
+	select CPU_FREQ_GOV_SMOOTHASS
+	help
+	  Use the CPUFreq governor 'smoothass' as default.
+
+config CPU_FREQ_DEFAULT_GOV_LAGFREE
+	bool "lagfree"
+	select CPU_FREQ_GOV_LAGFREE
+	help
+	  Use the CPUFreq governor 'lagfree' as default.
+
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -363,6 +382,34 @@ config CPU_FREQ_GOV_HOTPLUG
 	  'ondemand' instead.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_SAVAGEDZEN
+	tristate "'savagedzen' cpufreq policy governor"	
+	help	
+	  'savagedzen' - savagedzen CPU governor.
+
+config CPU_FREQ_GOV_SMOOTHASS
+	tristate "'smoothass' cpufreq policy governor"	
+	help	
+	  'smoothass' - smoothass CPU governor.
+
+config CPU_FREQ_GOV_LAGFREE
+	tristate "'lagfree' cpufreq policy governor"	
+	help	
+	  'lagfree' - lagfree CPU governor.
+
+config CPU_FREQ_MIN_TICKS
+	int "Ticks between governor polling interval."
+	default 10
+	help
+	  Minimum number of ticks between polling interval for governors.
+
+config CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER
+	int "Sampling rate multiplier for governors."
+	default 1000
+	help
+	  Sampling latency rate multiplied by the cpu switch latency.
+	  Affects governor polling.
 
 config SEC_DVFS
 	bool "DVFS job"
