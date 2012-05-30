@@ -1,8 +1,8 @@
 /* *  HCI_SMD (HCI Shared Memory Driver) is Qualcomm's Shared memory driver *  for the BT HCI protocol. * *  Copyright (c) 2000-2001, 2011-2012 Code Aurora Forum. All rights reserved. *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com> *  Copyright (C) 2004-2006  Marcel Holtmann <marcel@holtmann.org> * *  This file is based on drivers/bluetooth/hci_vhci.c * *  This program is free software; you can redistribute it and/or modify *  it under the terms of the GNU General Public License version 2 *  as published by the Free Software Foundation * *  This program is distributed in the hope that it will be useful, *  but WITHOUT ANY WARRANTY; without even the implied warranty of *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the *  GNU General Public License for more details. */
-#include <linux/module.h>#include <linux/kernel.h>#include <linux/init.h>#include <linux/errno.h>#include <linux/string.h>#include <linux/skbuff.h>#include <linux/wakelock.h>#include <linux/workqueue.h>#include <linux/uaccess.h>#include <net/bluetooth/bluetooth.h>#include <net/bluetooth/hci_core.h>#include <net/bluetooth/hci.h>#include <mach/msm_smd.h>
+#include <linux/module.h>#include <linux/kernel.h>#include <linux/init.h>#include <linux/errno.h>#include <linux/semaphore.h>#include <linux/string.h>#include <linux/skbuff.h>#include <linux/wakelock.h>#include <linux/workqueue.h>#include <linux/uaccess.h>#include <net/bluetooth/bluetooth.h>#include <net/bluetooth/hci_core.h>#include <net/bluetooth/hci.h>#include <mach/msm_smd.h>
 #define EVENT_CHANNEL		"APPS_RIVA_BT_CMD"#define DATA_CHANNEL		"APPS_RIVA_BT_ACL"#define RX_Q_MONITOR		(2000)	/* 1 milli second */
 
-static int hcismd_set;static DEFINE_MUTEX(hci_smd_enable);
+static int hcismd_set;static DEFINE_SEMAPHORE(hci_smd_enable);static int restart_in_progress;
 static int hcismd_set_enable(const char *val, struct kernel_param *kp);module_param_call(hcismd_set, hcismd_set_enable, NULL, &hcismd_set, 0644);
 static void hci_dev_smd_open(struct work_struct *worker);
 static void hci_dev_restart(struct work_struct *worker);
@@ -79,23 +79,23 @@ static void hci_smd_deregister_dev(struct hci_smd_data *hsmd){	tasklet_kill(&h
 	smd_close(hs.event_channel);	smd_close(hs.data_channel);
 	if (wake_lock_active(&hs.wake_lock_rx))		wake_unlock(&hs.wake_lock_rx);	if (wake_lock_active(&hs.wake_lock_tx))		wake_unlock(&hs.wake_lock_tx);
 	/*Destroy the timer used to monitor the Rx queue for emptiness */	if (hs.rx_q_timer.function) {		del_timer_sync(&hs.rx_q_timer);		hs.rx_q_timer.function = NULL;		hs.rx_q_timer.data = 0;	}}
-static void hci_dev_restart(struct work_struct *worker){	mutex_lock(&hci_smd_enable);	hci_smd_deregister_dev(&hs);	hci_smd_register_smd(&hs);
-	mutex_unlock(&hci_smd_enable);
+static void hci_dev_restart(struct work_struct *worker){	down(&hci_smd_enable);	restart_in_progress = 1;	hci_smd_deregister_dev(&hs);	hci_smd_register_smd(&hs);
+	up(&hci_smd_enable);
 	kfree(worker);
 }
 
 static void hci_dev_smd_open(struct work_struct *worker)
 {
-	mutex_lock(&hci_smd_enable);
+	down(&hci_smd_enable);	if (restart_in_progress == 1) {        /* Allow wcnss to initialize */        restart_in_progress = 0;	    msleep(10000);    }
 	hci_smd_hci_register_dev(&hs);
-	mutex_unlock(&hci_smd_enable);	kfree(worker);}
+	up(&hci_smd_enable);	kfree(worker);}
 static int hcismd_set_enable(const char *val, struct kernel_param *kp){	int ret = 0;
-	mutex_lock(&hci_smd_enable);
+	pr_err("hcismd_set_enable %d", hcismd_set);    down(&hci_smd_enable);
 	ret = param_set_int(val, kp);
 	if (ret)		goto done;
 	switch (hcismd_set) {
-	case 1:		hci_smd_register_smd(&hs);
+	case 1:		if (hs.hdev == NULL)			hci_smd_register_smd(&hs);
 	break;	case 0:		hci_smd_deregister_dev(&hs);	break;	default:		ret = -EFAULT;	}
-done:	mutex_unlock(&hci_smd_enable);	return ret;}static int  __init hci_smd_init(void){	wake_lock_init(&hs.wake_lock_rx, WAKE_LOCK_SUSPEND,			 "msm_smd_Rx");	wake_lock_init(&hs.wake_lock_tx, WAKE_LOCK_SUSPEND,			 "msm_smd_Tx");	return 0;}module_init(hci_smd_init);
+done:	up(&hci_smd_enable);	return ret;}static int  __init hci_smd_init(void){	wake_lock_init(&hs.wake_lock_rx, WAKE_LOCK_SUSPEND,			 "msm_smd_Rx");	wake_lock_init(&hs.wake_lock_tx, WAKE_LOCK_SUSPEND,			 "msm_smd_Tx");	restart_in_progress = 0;    hs.hdev = NULL;	return 0;}module_init(hci_smd_init);
 static void __exit hci_smd_exit(void){	wake_lock_destroy(&hs.wake_lock_rx);	wake_lock_destroy(&hs.wake_lock_tx);}module_exit(hci_smd_exit);
 MODULE_AUTHOR("Ankur Nandwani <ankurn@codeaurora.org>");MODULE_DESCRIPTION("Bluetooth SMD driver");MODULE_LICENSE("GPL v2");
