@@ -18,15 +18,15 @@
 #include <linux/bio.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#include <linux/slab.h>
+#include <linux/version.h>
 
 enum { ASYNC, SYNC };
 
 /* Tunables */
-static const int sync_read_expire = HZ / 2;	/* max time before a sync read is submitted. */
+static const int sync_read_expire  = HZ / 2;	/* max time before a sync read is submitted. */
 static const int sync_write_expire = 2 * HZ;	/* max time before a sync write is submitted. */
 
-static const int async_read_expire = 4 * HZ;	/* ditto for async, these limits are SOFT! */
+static const int async_read_expire  =  4 * HZ;	/* ditto for async, these limits are SOFT! */
 static const int async_write_expire = 16 * HZ;	/* ditto for async, these limits are SOFT! */
 
 static const int writes_starved = 1;		/* max times reads can starve a write */
@@ -82,6 +82,7 @@ sio_add_request(struct request_queue *q, struct request *rq)
 	list_add_tail(&rq->queuelist, &sd->fifo_list[sync][data_dir]);
 }
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,38)
 static int
 sio_queue_empty(struct request_queue *q)
 {
@@ -91,6 +92,7 @@ sio_queue_empty(struct request_queue *q)
 	return list_empty(&sd->fifo_list[SYNC][READ]) && list_empty(&sd->fifo_list[SYNC][WRITE]) &&
 	       list_empty(&sd->fifo_list[ASYNC][READ]) && list_empty(&sd->fifo_list[ASYNC][WRITE]);
 }
+#endif
 
 static struct request *
 sio_expired_request(struct sio_data *sd, int sync, int data_dir)
@@ -135,7 +137,6 @@ sio_choose_expired_request(struct sio_data *sd)
 	if (rq)
 		return rq;
 
-
 	return NULL;
 }
 
@@ -166,7 +167,6 @@ sio_choose_request(struct sio_data *sd, int data_dir)
 static inline void
 sio_dispatch_request(struct sio_data *sd, struct request *rq)
 {
-
 	/*
 	 * Remove the request from the fifo list
 	 * and dispatch it.
@@ -362,7 +362,9 @@ static struct elevator_type iosched_sio = {
 		.elevator_merge_req_fn		= sio_merged_requests,
 		.elevator_dispatch_fn		= sio_dispatch_requests,
 		.elevator_add_req_fn		= sio_add_request,
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,38)
 		.elevator_queue_empty_fn	= sio_queue_empty,
+#endif
 		.elevator_former_req_fn		= sio_former_request,
 		.elevator_latter_req_fn		= sio_latter_request,
 		.elevator_init_fn		= sio_init_queue,
@@ -394,3 +396,4 @@ module_exit(sio_exit);
 MODULE_AUTHOR("Miguel Boton");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Simple IO scheduler");
+MODULE_VERSION("0.2");
