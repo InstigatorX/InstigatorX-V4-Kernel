@@ -151,7 +151,13 @@ config CPU_FREQ_DEFAULT_GOV_BADASS
 config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
 	bool "pegasusq"
 	select CPU_FREQ_GOV_PEGASUSQ
-	
+
+config CPU_FREQ_DEFAULT_GOV_WHEATLEY
+	bool "wheatley"
+	select CPU_FREQ_GOV_WHEATLEY
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'wheatley' as default.
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -279,7 +285,9 @@ config CPU_FREQ_GOV_LULZACTIVE
         help
           'lulzactive' - a new interactive governor by Tegrak!
 
-          If in doubt, say N.
+config CPU_FREQ_GOV_WHEATLEY
+	tristate "'wheatley' cpufreq governor"
+	depends on CPU_FREQ
 
 config CPU_FREQ_GOV_PEGASUSQ
         tristate "'pegasusq' cpufreq governor"
