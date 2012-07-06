@@ -91,3 +91,4 @@ obj-$(CONFIG_TZCOM) += tzic.o
 ifeq ($(CONFIG_GENERIC_BLN),y)
 obj-$(CONFIG_GENERIC_BLN) += bln.o
 endif
+obj-$(CONFIG_FSYNC_CONTROL)	+= fsync_control.o

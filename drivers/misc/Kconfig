@@ -702,4 +702,10 @@ config GENERIC_BLN
       Say Y here to enable the backlight notification
       for android led-notification (modified liblight needed)
 
+config FSYNC_CONTROL
+        bool "Support for FSync Control"
+        default y
+        help
+          Say Y here to enable FSync Control
+
 endif # MISC_DEVICES
