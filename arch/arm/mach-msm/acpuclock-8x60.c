@@ -49,7 +49,7 @@
 #define L_VAL_SCPLL_CAL_MAX	0x23 /* = 1836 MHz with 27MHz source */
 
 #define MAX_VDD_SC		1400000 /* uV */
-#define MIN_VDD_SC      800000 /* uV */
+#define MIN_VDD_SC      700000 /* uV */
 #define MAX_VDD_MEM		1400000 /* uV */
 #define MAX_VDD_DIG		1200000 /* uV */
 #define MAX_AXI			 310500 /* KHz */

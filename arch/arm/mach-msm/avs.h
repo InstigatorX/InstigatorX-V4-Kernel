@@ -14,7 +14,7 @@
 #ifndef AVS_H
 #define AVS_H
 
-#define VOLTAGE_MIN  800 /* mV */
+#define VOLTAGE_MIN  700 /* mV */
 #define VOLTAGE_MAX  1400
 #define VOLTAGE_STEP 25
 
