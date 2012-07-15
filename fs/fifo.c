@@ -14,7 +14,11 @@
 #include <linux/sched.h>
 #include <linux/pipe_fs_i.h>
 
+<<<<<<< HEAD
 static bool wait_for_partner(struct inode* inode, unsigned int *cnt)
+=======
+static int wait_for_partner(struct inode* inode, unsigned int *cnt)
+>>>>>>> 7d50b51... fifo: Do not restart open() if it already found a partner
 {
 	int cur = *cnt;	
 
@@ -23,7 +27,11 @@ static bool wait_for_partner(struct inode* inode, unsigned int *cnt)
 		if (signal_pending(current))
 			break;
 	}
+<<<<<<< HEAD
 	return cur != *cnt;
+=======
+	return cur == *cnt ? -ERESTARTSYS : 0;
+>>>>>>> 7d50b51... fifo: Do not restart open() if it already found a partner
 }
 
 static void wake_up_partner(struct inode* inode)
@@ -68,7 +76,11 @@ static int fifo_open(struct inode *inode, struct file *filp)
 				 * seen a writer */
 				filp->f_version = pipe->w_counter;
 			} else {
+<<<<<<< HEAD
 				if(!wait_for_partner(inode, &pipe->w_counter))
+=======
+				if (wait_for_partner(inode, &pipe->w_counter))
+>>>>>>> 7d50b51... fifo: Do not restart open() if it already found a partner
 					goto err_rd;
 			}
 		}
@@ -90,7 +102,11 @@ static int fifo_open(struct inode *inode, struct file *filp)
 			wake_up_partner(inode);
 
 		if (!pipe->readers) {
+<<<<<<< HEAD
 			if (!wait_for_partner(inode, &pipe->r_counter))
+=======
+			if (wait_for_partner(inode, &pipe->r_counter))
+>>>>>>> 7d50b51... fifo: Do not restart open() if it already found a partner
 				goto err_wr;
 		}
 		break;
