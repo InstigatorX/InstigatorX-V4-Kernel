@@ -408,21 +408,22 @@ __ATTR_NULL
 };
 
 static struct elevator_type iosched_vr = {
-.ops = {
-.elevator_merge_fn = vr_merge,
-.elevator_merged_fn = vr_merged_request,
-.elevator_merge_req_fn = vr_merged_requests,
-.elevator_dispatch_fn = vr_dispatch_requests,
-.elevator_add_req_fn = vr_add_request,
-.elevator_former_req_fn = elv_rb_former_request,
-.elevator_latter_req_fn = elv_rb_latter_request,
-.elevator_init_fn = vr_init_queue,
-.elevator_exit_fn = vr_exit_queue,
-},
+ .ops = {
+ .elevator_merge_fn = vr_merge,
+ .elevator_merged_fn = vr_merged_request,
+ .elevator_merge_req_fn = vr_merged_requests,
+ .elevator_dispatch_fn = vr_dispatch_requests,
+ .elevator_add_req_fn = vr_add_request,
+ .elevator_queue_empty_fn = vr_queue_empty,
+ .elevator_former_req_fn = elv_rb_former_request,
+ .elevator_latter_req_fn = elv_rb_latter_request,
+ .elevator_init_fn = vr_init_queue,
+ .elevator_exit_fn = vr_exit_queue,
+ },
 
-.elevator_attrs = vr_attrs,
-.elevator_name = "vr",
-.elevator_owner = THIS_MODULE,
+ .elevator_attrs = vr_attrs,
+ .elevator_name = "vr",
+ .elevator_owner = THIS_MODULE,
 };
 
 static int __init vr_init(void)
