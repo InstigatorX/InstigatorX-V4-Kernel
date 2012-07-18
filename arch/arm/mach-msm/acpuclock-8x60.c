@@ -87,7 +87,7 @@
 /* PTE EFUSE register. */
 #define QFPROM_PTE_EFUSE_ADDR		(MSM_QFPROM_BASE + 0x00C0)
 
-#define FREQ_TABLE_SIZE      38
+#define FREQ_TABLE_SIZE      36
 
 static const void * const clk_ctl_addr[] = {SPSS0_CLK_CTL_ADDR,
 			SPSS1_CLK_CTL_ADDR};
@@ -199,11 +199,11 @@ static struct clkctl_l2_speed l2_freq_tbl_v2[] = {
 	[19] = {1404000,  1, 0x1A, 1200000, 1250000, 4},
 	[20] = {1458000,  1, 0x1B, 1200000, 1250000, 4},
 	[21] = {1512000,  1, 0x1C, 1200000, 1250000, 4},
-	[22] = {1566000,  1, 0x1D, 1200000, 1250000, 4},
-	[23] = {1620000,  1, 0x1E, 1200000, 1275000, 4},
-	[24] = {1674000,  1, 0x1F, 1200000, 1275000, 4},
-	[25] = {1728000,  1, 0x20, 1200000, 1300000, 4},
-	[26] = {1782000,  1, 0x21, 1200000, 1325000, 4},
+	[22] = {1566000,  1, 0x1D, 1250000, 1250000, 5},
+	[23] = {1620000,  1, 0x1E, 1250000, 1275000, 5},
+	[24] = {1674000,  1, 0x1F, 1250000, 1275000, 5},
+	[25] = {1728000,  1, 0x20, 1250000, 1300000, 5},
+	[26] = {1782000,  1, 0x21, 1250000, 1325000, 5},
 };
 
 #define L2(x) (&l2_freq_tbl_v2[(x)])
@@ -239,9 +239,11 @@ static struct clkctl_acpu_speed acpu_freq_tbl_slow[] = {
   { {1, 1}, 1674000,  ACPU_SCPLL, 0, 0, 1, 0x1F, L2(24), 1250000, 0x03006000},
   { {1, 1}, 1728000,  ACPU_SCPLL, 0, 0, 1, 0x20, L2(25), 1300000, 0x03006000},
   { {1, 1}, 1782000,  ACPU_SCPLL, 0, 0, 1, 0x21, L2(26), 1300000, 0x03006000},
-  { {1, 1}, 1836000,  ACPU_SCPLL, 0, 0, 1, 0x22, L2(26), 1325000, 0x03006000},
+  { {1, 1}, 1836000,  ACPU_SCPLL, 0, 0, 1, 0x22, L2(26), 1350000, 0x03006000},
+/*  
   { {1, 1}, 1890000,  ACPU_SCPLL, 0, 0, 1, 0x23, L2(26), 1350000, 0x03006000},
   { {1, 1}, 1944000,  ACPU_SCPLL, 0, 0, 1, 0x24, L2(26), 1375000, 0x03006000},
+*/
   { {0, 0}, 0 },
 };
 
@@ -844,14 +846,14 @@ uint32_t acpu_check_khz_value(unsigned long khz)
 {
 	struct clkctl_acpu_speed *f;
 
-	if (khz > MAX_FREQ_LIMIT)
+	if (khz > CONFIG_MSM_CPU_FREQ_MAX)
 		return CONFIG_MSM_CPU_FREQ_MAX;
 
-	if (khz < MIN_FREQ_LIMIT)
+	if (khz < CONFIG_MSM_CPU_FREQ_MIN)
 		return CONFIG_MSM_CPU_FREQ_MIN;
 
 	for (f = acpu_freq_tbl_slow; f->acpuclk_khz != 0; f++) {
-		if (khz < 192000) {
+		if (khz < CONFIG_MSM_CPU_FREQ_MIN) {
 			if (f->acpuclk_khz == (khz*1000))
 				return f->acpuclk_khz;
 			if ((khz*1000) > f->acpuclk_khz) {
@@ -886,7 +888,7 @@ static __init struct clkctl_acpu_speed *select_freq_plan(void)
 	uint32_t max_khz;
 	struct clkctl_acpu_speed *f;
 
-	max_khz = MAX_FREQ_LIMIT;
+	max_khz = CONFIG_MSM_CPU_FREQ_MAX;
 		acpu_freq_tbl = acpu_freq_tbl_slow;
 
 	/* Truncate the table based to max_khz. */
@@ -929,7 +931,7 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 
 	/* Improve boot time by ramping up CPUs immediately. */
 	for_each_online_cpu(cpu)
-		acpuclk_8x60_set_rate(cpu, CONFIG_MSM_CPU_FREQ_MAX, SETRATE_INIT);
+		acpuclk_8x60_set_rate(cpu, max_freq->acpuclk_khz, SETRATE_INIT);
 
 	acpuclk_register(&acpuclk_8x60_data);
 	cpufreq_table_init();
