@@ -44,12 +44,11 @@ static struct workqueue_struct *msm_cpufreq_wq;
 #endif
 
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
-	/* Because we are hotplugging CPU1 using mpdecision, init should
-	   not change min/max after initial fixup to accomodate user changes */
-	int cpuinitcount = 0;
-	#define NUM_CORES 2
+/* Because we are hotplugging CPU1 using mpdecision, init should
+   not change min/max after initial fixup to accomodate user changes */
+int cpuinitcount = 0;
+#define NUM_CORES 2
 #endif
-
 
 struct cpufreq_suspend_t {
 	struct mutex suspend_mutex;
@@ -234,14 +233,12 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 		return -ENODEV;
 
 	table = cpufreq_frequency_get_table(policy->cpu);
-	if (table == NULL)
-		return -ENODEV;
 	if (cpufreq_frequency_table_cpuinfo(policy, table)) {
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
-	if (cpuinitcount < NUM_CORES) {
-		policy->cpuinfo.min_freq = CONFIG_MSM_CPU_FREQ_MIN;
-		policy->cpuinfo.max_freq = CONFIG_MSM_CPU_FREQ_MAX;
-	}
+		if (cpuinitcount < NUM_CORES) {
+			policy->cpuinfo.min_freq = CONFIG_MSM_CPU_FREQ_MIN;
+			policy->cpuinfo.max_freq = CONFIG_MSM_CPU_FREQ_MAX;
+		}
 #endif
 	}
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
@@ -256,14 +253,13 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	    CPUFREQ_RELATION_H, &index) &&
 	    cpufreq_frequency_table_target(policy, table, cur_freq,
 	    CPUFREQ_RELATION_L, &index)) {
-		
-		#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
+#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
 		pr_info("cpufreq: cpu%d at invalid freq: %d - init # %d\n",
 				policy->cpu, cur_freq, cpuinitcount);
-		#else
+#else
 		pr_info("cpufreq: cpu%d at invalid freq: %d\n",
 				policy->cpu, cur_freq);
-		#endif
+#endif
 		return -EINVAL;
 	}
 
@@ -273,13 +269,13 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 				SETRATE_CPUFREQ);
 		if (ret)
 			return ret;
-		#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
-			pr_info("cpufreq: cpu%d init at %d switching to %d - init # %d\n",
-					policy->cpu, cur_freq, table[index].frequency, cpuinitcount);
-		#else
+#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
+		pr_info("cpufreq: cpu%d init at %d switching to %d - init # %d\n",
+				policy->cpu, cur_freq, table[index].frequency, cpuinitcount);
+#else
 		pr_info("cpufreq: cpu%d init at %d switching to %d\n",
 				policy->cpu, cur_freq, table[index].frequency);
-		#endif
+#endif
 		cur_freq = table[index].frequency;
 	}
 
@@ -295,7 +291,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
 	cpuinitcount++;
 #endif
-
 	return 0;
 }
 

@@ -45,8 +45,8 @@
 /* PLL calibration limits.
  * The PLL hardware has a minimum frequency of 384MHz.
  * Calibration should respect this limit. */
-#define L_VAL_SCPLL_CAL_MIN	0x06 /* =  432 MHz with 27MHz source */
-#define L_VAL_SCPLL_CAL_MAX	0x22 /* = 1836 MHz with 27MHz source */
+#define L_VAL_SCPLL_CAL_MIN	0x08 /* =  432 MHz with 27MHz source */
+#define L_VAL_SCPLL_CAL_MAX	0x23 /* = 1890 MHz with 27MHz source */
 
 #define MAX_VDD_SC		1400000 /* uV */
 #define MIN_VDD_SC      800000 /* uV */
@@ -88,7 +88,7 @@
 /* PTE EFUSE register. */
 #define QFPROM_PTE_EFUSE_ADDR		(MSM_QFPROM_BASE + 0x00C0)
 
-#define FREQ_TABLE_SIZE      36
+#define FREQ_TABLE_SIZE      40
 
 static const void * const clk_ctl_addr[] = {SPSS0_CLK_CTL_ADDR,
 			SPSS1_CLK_CTL_ADDR};
@@ -198,18 +198,7 @@ static struct clkctl_l2_speed l2_freq_tbl_v2[] = {
 	[17] = {1296000,  1, 0x18, 1200000, 1225000, 3},
 	[18] = {1350000,  1, 0x19, 1200000, 1225000, 3},
 	[19] = {1404000,  1, 0x1A, 1200000, 1250000, 4},
-/*	[20] = {1458000,  1, 0x1B, 1200000, 1250000, 4},
-	[21] = {1512000,  1, 0x1C, 1200000, 1250000, 4},
-	[22] = {1566000,  1, 0x1D, 1250000, 1250000, 4},
-	
-*/
-
 	[20] = {1620000,  1, 0x1E, 1250000, 1275000, 5},
-/*
-	[24] = {1674000,  1, 0x1F, 1250000, 1275000, 4},
-	[25] = {1728000,  1, 0x20, 1250000, 1300000, 4},
-	[26] = {1782000,  1, 0x21, 1250000, 1325000, 4},
-*/
 };
 
 #define L2(x) (&l2_freq_tbl_v2[(x)])
