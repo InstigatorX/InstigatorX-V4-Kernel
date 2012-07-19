@@ -348,7 +348,7 @@ static inline unsigned int cpufreq_quick_get(unsigned int cpu)
 #define LOW_MAX_FREQ_LIMIT 1188000
 
 #define MIN_FREQ_LIMIT 192000
-#define MAX_FREQ_LIMIT 1782000
+static int MAX_FREQ_LIMIT = 1512000;
 
 enum {
 	SET_MIN = 0,
@@ -409,6 +409,18 @@ int cpufreq_set_limit_defered(unsigned int flag, unsigned int value);
 int cpufreq_get_dvfs_state(void);
 
 #endif
+
+#ifdef CONFIG_SEC_DVFS_DUAL
+void dual_boost(unsigned int boost_on);
+#endif
+
+int set_freq_limit(unsigned long id, unsigned int freq);
+
+unsigned int get_min_lock(void);
+unsigned int get_max_lock(void);
+void set_min_lock(int freq);
+void set_max_lock(int freq);
+
 
 /*********************************************************************
  *                       CPUFREQ DEFAULT GOVERNOR                    *
