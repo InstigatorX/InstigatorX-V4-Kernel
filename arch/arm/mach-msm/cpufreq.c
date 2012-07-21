@@ -58,6 +58,10 @@ struct cpufreq_suspend_t {
 static DEFINE_PER_CPU(struct cpufreq_suspend_t, cpufreq_suspend);
 
 static int override_cpu;
+
+uint32_t cmdline_maxscroff = 486000;
+bool cmdline_scroff = false;
+
 #ifdef CONFIG_SEC_DVFS
 static unsigned int upper_limit_freq = 0;
 static unsigned int lower_limit_freq = 0;
@@ -140,6 +144,54 @@ static void set_cpu_work(struct work_struct *work)
 	complete(&cpu_work->complete);
 }
 #endif
+
+static void msm_cpufreq_early_suspend(struct early_suspend *h)
+{
+	uint32_t curfreq;
+	int cpu;
+
+	for_each_possible_cpu(cpu) {
+		mutex_lock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
+		if (cmdline_maxscroff) {
+			cmdline_scroff = true;
+			curfreq = acpuclk_get_rate(cpu);
+			if (curfreq > cmdline_maxscroff) {
+				acpuclk_set_rate(cpu, cmdline_maxscroff, SETRATE_CPUFREQ);
+				curfreq = acpuclk_get_rate(cpu);
+				printk(KERN_INFO "[cmdline_maxscroff]: Limited freq to '%u'\n", curfreq);
+			}
+		}
+		mutex_unlock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
+	}
+}
+
+static void msm_cpufreq_late_resume(struct early_suspend *h)
+{
+	uint32_t curfreq;
+	int cpu;
+	struct cpufreq_work_struct *cpu_work;
+
+	for_each_possible_cpu(cpu) {
+		mutex_lock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
+		if (cmdline_scroff == true) {
+			cmdline_scroff = false;
+			cpu_work = &per_cpu(cpufreq_work, cpu);
+			curfreq = acpuclk_get_rate(cpu);
+			if (curfreq != cpu_work->frequency) {
+				acpuclk_set_rate(cpu, cpu_work->frequency, SETRATE_CPUFREQ);
+				curfreq = acpuclk_get_rate(cpu);
+				printk(KERN_INFO "[cmdline_maxscroff]: Unlocking freq to '%u'\n", curfreq);
+			}
+		}
+		mutex_unlock(&per_cpu(cpufreq_suspend, cpu).suspend_mutex);
+	}
+}
+
+static struct early_suspend msm_cpufreq_early_suspend_handler = {
+	.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN,
+	.suspend = msm_cpufreq_early_suspend,
+	.resume = msm_cpufreq_late_resume,
+};
 
 static int msm_cpufreq_target(struct cpufreq_policy *policy,
 				unsigned int target_freq,
@@ -352,8 +404,53 @@ static ssize_t store_mfreq(struct sysdev_class *class,
 
 static SYSDEV_CLASS_ATTR(mfreq, 0200, NULL, store_mfreq);
 
+static ssize_t show_max_screen_off_khz(struct cpufreq_policy *policy, char *buf)
+{
+	return sprintf(buf, "%u\n", cmdline_maxscroff);
+}
+
+static ssize_t store_max_screen_off_khz(struct cpufreq_policy *policy,
+		const char *buf, size_t count)
+{
+	unsigned int freq = 0;
+	int ret;
+	int index;
+	struct cpufreq_frequency_table *freq_table = cpufreq_frequency_get_table(policy->cpu);
+
+	if (!freq_table)
+		return -EINVAL;
+
+	ret = sscanf(buf, "%u", &freq);
+	if (ret != 1)
+		return -EINVAL;
+
+	mutex_lock(&per_cpu(cpufreq_suspend, policy->cpu).suspend_mutex);
+
+	ret = cpufreq_frequency_table_target(policy, freq_table, freq,
+			CPUFREQ_RELATION_H, &index);
+	if (ret)
+		goto out;
+
+	cmdline_maxscroff = freq_table[index].frequency;
+
+	ret = count;
+
+out:
+	mutex_unlock(&per_cpu(cpufreq_suspend, policy->cpu).suspend_mutex);
+	return ret;
+}
+
+struct freq_attr msm_cpufreq_attr_max_screen_off_khz = {
+	.attr = { .name = "screen_off_max_freq",
+		.mode = 0644,
+	},
+	.show = show_max_screen_off_khz,
+	.store = store_max_screen_off_khz,
+};
+
 static struct freq_attr *msm_freq_attr[] = {
 	&cpufreq_freq_attr_scaling_available_freqs,
+	&msm_cpufreq_attr_max_screen_off_khz,
 	NULL,
 };
 
@@ -395,6 +492,7 @@ static int __init msm_cpufreq_register(void)
 #endif
 
 	register_pm_notifier(&msm_cpufreq_pm_notifier);
+	register_early_suspend(&msm_cpufreq_early_suspend_handler);
 	return cpufreq_register_driver(&msm_cpufreq_driver);
 }
 
