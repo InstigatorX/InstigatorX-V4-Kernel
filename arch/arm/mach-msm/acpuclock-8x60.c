@@ -836,14 +836,14 @@ uint32_t acpu_check_khz_value(unsigned long khz)
 {
 	struct clkctl_acpu_speed *f;
 
-	if (khz > CONFIG_MSM_CPU_FREQ_MAX)
-		return CONFIG_MSM_CPU_FREQ_MAX;
+	if (khz > 1890000)
+		return 1890000;
 
-	if (khz < CONFIG_MSM_CPU_FREQ_MIN)
-		return CONFIG_MSM_CPU_FREQ_MIN;
+	if (khz < 192000)
+		return 192000;
 
 	for (f = acpu_freq_tbl_slow; f->acpuclk_khz != 0; f++) {
-		if (khz < CONFIG_MSM_CPU_FREQ_MIN) {
+		if (khz < 192000) {
 			if (f->acpuclk_khz == (khz*1000))
 				return f->acpuclk_khz;
 			if ((khz*1000) > f->acpuclk_khz) {
@@ -878,7 +878,7 @@ static __init struct clkctl_acpu_speed *select_freq_plan(void)
 	uint32_t max_khz;
 	struct clkctl_acpu_speed *f;
 
-	max_khz = CONFIG_MSM_CPU_FREQ_MAX;
+	max_khz = 1890000;
 		acpu_freq_tbl = acpu_freq_tbl_slow;
 
 	/* Truncate the table based to max_khz. */
@@ -922,7 +922,7 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 
 	/* Improve boot time by ramping up CPUs immediately. */
 	for_each_online_cpu(cpu)
-		acpuclk_8x60_set_rate(cpu, 1512000, SETRATE_INIT);
+		acpuclk_8x60_set_rate(cpu, max_freq->acpuclk_khz, SETRATE_INIT);
 
 	acpuclk_register(&acpuclk_8x60_data);
 	cpufreq_table_init();
