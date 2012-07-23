@@ -148,6 +148,8 @@
 #include "acpuclock.h"
 #include "pm-boot.h"
 
+#include <linux/msm_tsens.h>
+
 #ifdef CONFIG_CPU_FREQ_GOV_BADASS_2_PHASE
 int set_two_phase_freq_badass(int cpufreq);
 #endif
@@ -7643,12 +7645,21 @@ static struct platform_device bcm4330_bluetooth_device = {
 };
 #endif
 
+static struct tsens_platform_data msm_tsens_pdata  = {
+ 	 .tsens_factor    = 1000,
+ 	 .hw_type    = MSM_8660,
+ 	 .tsens_num_sensor  = 3,
+ 	 .slope       = 702,
+};
 
+/*
 
 static struct platform_device msm_tsens_device = {
 	.name   = "tsens-tm",
 	.id = -1,
 };
+
+*/
 
 #ifdef CONFIG_VP_A2220
 #ifdef CONFIG_USE_A2220_B
@@ -9728,7 +9739,7 @@ static struct platform_device *surf_devices[] __initdata = {
 	&msm_device_rng,
 #endif
 
-	&msm_tsens_device,
+	//&msm_tsens_device,
 	&msm_rpm_device,
 #ifdef CONFIG_ION_MSM
 	&ion_dev,
@@ -16811,6 +16822,8 @@ static void __init msm8x60_init(struct msm_board_data *board_data)
 #endif
 
 	pmic_reset_irq = PM8058_IRQ_BASE + PM8058_RESOUT_IRQ;
+
+	msm_tsens_early_init(&msm_tsens_pdata);
 
 	/*
 	 * Initialize RPM first as other drivers and devices may need
