@@ -910,6 +910,7 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 	spin_lock_init(&drv_state.l2_lock);
 
 	/* Configure hardware. */
+	max_freq = select_freq_plan();
 	acpu_freq_tbl = acpu_freq_tbl_slow;
 	unselect_scplls();
 	scpll_set_refs();
@@ -921,7 +922,7 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 
 	/* Improve boot time by ramping up CPUs immediately. */
 	for_each_online_cpu(cpu)
-		acpuclk_8x60_set_rate(cpu, MAX_FREQ_LIMIT, SETRATE_INIT);
+		acpuclk_8x60_set_rate(cpu, 1512000, SETRATE_INIT);
 
 	acpuclk_register(&acpuclk_8x60_data);
 	cpufreq_table_init();
