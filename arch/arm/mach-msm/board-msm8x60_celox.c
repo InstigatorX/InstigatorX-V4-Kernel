@@ -7645,10 +7645,10 @@ static struct platform_device bcm4330_bluetooth_device = {
 };
 #endif
 
-static struct tsens_platform_data msm_tsens_pdata  = {
+static struct tsens_platform_data msm_tsens_pdata = {
  	 .tsens_factor    = 1000,
  	 .hw_type    = MSM_8660,
- 	 .tsens_num_sensor  = 3,
+ 	 .tsens_num_sensor  = 6,
  	 .slope       = 702,
 };
 
