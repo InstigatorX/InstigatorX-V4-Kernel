@@ -74,3 +74,13 @@ arch/arm/kernel/vmlinux.lds
 drivers/tty/vt/consolemap_deftbl.c
 kernel/config_data.h
 usr/initramfs_data.cpio
+
+arch/arm/boot/Image
+
+arch/arm/boot/compressed/lib1funcs.S
+
+arch/arm/boot/compressed/piggy.gzip
+
+arch/arm/boot/compressed/vmlinux
+
+arch/arm/boot/compressed/vmlinux.lds
