@@ -22,8 +22,6 @@ modules.builtin
 *.lzo
 *.patch
 *.gcno
-scripts/*
-arch/arm/boot/*
 .DS_Store
 /tags
 /TAGS
@@ -75,5 +73,4 @@ drivers/tty/vt/defkeymap.c
 arch/arm/kernel/vmlinux.lds
 drivers/tty/vt/consolemap_deftbl.c
 kernel/config_data.h
-
 usr/initramfs_data.cpio
