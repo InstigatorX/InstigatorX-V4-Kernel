@@ -7645,21 +7645,21 @@ static struct platform_device bcm4330_bluetooth_device = {
 };
 #endif
 
+#ifdef CONFIG_THERMAL_TSENS8x60
 static struct tsens_platform_data msm_tsens_pdata = {
  	 .tsens_factor    = 1000,
  	 .hw_type    = MSM_8660,
  	 .tsens_num_sensor  = 6,
  	 .slope       = 702,
 };
+#endif
 
-/*
-
+#ifndef CONFIG_THERMAL_TSENS8x60
 static struct platform_device msm_tsens_device = {
 	.name   = "tsens-tm",
 	.id = -1,
 };
-
-*/
+#endif
 
 #ifdef CONFIG_VP_A2220
 #ifdef CONFIG_USE_A2220_B
@@ -9739,8 +9739,12 @@ static struct platform_device *surf_devices[] __initdata = {
 	&msm_device_rng,
 #endif
 
-	//&msm_tsens_device,
+#ifndef CONFIG_THERMAL_TSENS8x60
+	&msm_tsens_device,
+#endif
+
 	&msm_rpm_device,
+
 #ifdef CONFIG_ION_MSM
 	&ion_dev,
 #endif
@@ -16823,7 +16827,9 @@ static void __init msm8x60_init(struct msm_board_data *board_data)
 
 	pmic_reset_irq = PM8058_IRQ_BASE + PM8058_RESOUT_IRQ;
 
+#ifdef CONFIG_THERMAL_TSENS8x60
 	msm_tsens_early_init(&msm_tsens_pdata);
+#endif
 
 	/*
 	 * Initialize RPM first as other drivers and devices may need
