@@ -94,3 +94,25 @@ scripts/kconfig/lex.zconf.c
 scripts/kconfig/zconf.hash.c
 
 scripts/kconfig/zconf.tab.c
+
+scripts/mod/modpost
+
+scripts/mod/mk_elfconfig
+
+scripts/mod/elfconfig.h
+
+scripts/kallsyms
+
+scripts/genksyms/parse.h
+
+scripts/genksyms/parse.c
+
+scripts/genksyms/lex.c
+
+scripts/genksyms/keywords.c
+
+scripts/genksyms/genksyms
+
+scripts/conmakehash
+
+scripts/bin2c
