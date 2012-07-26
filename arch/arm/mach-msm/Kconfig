@@ -261,6 +261,10 @@ config ARCH_MSM9615
 
 endmenu
 
+config TOOLCHAIN_463
+	bool "Enables Toolchain 4.6.3 support"
+	default n
+
 choice
 	prompt "MSM SoC Revision"
 	default MSM_SOC_REV_NONE

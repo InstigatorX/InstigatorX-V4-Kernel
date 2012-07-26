@@ -1,4 +1,3 @@
-
 # replace board-msm8x60.o and gpiomux-8x60.o with own model's ones
 
 BOARD_OBJ_NAME:=board-msm8x60.o # default name
@@ -27,6 +26,10 @@ endif
 ifdef CONFIG_TARGET_SERIES_P8LTE
 BOARD_OBJ_NAME:=board-msm8x60_p8lte.o
 GPIOMUX_OBJ_NAME:=gpiomux-8x60_p8lte.o
+endif
+
+ifdef CONFIG_TOOLCHAIN_463
+CFLAGS_scm.o := -DREQUIRES_SEC=1
 endif
 
 obj-y += io.o dma.o memory.o

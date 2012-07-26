@@ -193,7 +193,12 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= arm
-CROSS_COMPILE	?= /opt/toolchains/arm-eabi-4.4.3/bin/arm-eabi-
+
+#ifdef CONFIG_TOOLCHAIN_463
+#	CROSS_COMPILE  ?= /opt/toolchains/arm-linux-androideabi-4.6.3/prebuilt/darwin-x86/bin/arm-linux-androideabi-
+#else
+	CROSS_COMPILE	?= /opt/toolchains/arm-eabi-4.4.3/bin/arm-eabi-
+#endif
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -378,6 +383,14 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -marm -march=armv7-a -mtune=cortex-a9 \
 		   -funswitch-loops -fpredictive-commoning \
 		   -fmodulo-sched -fmodulo-sched-allow-regmoves
+
+#ifdef CONFIG_TOOLCHAIN_463
+#KBUILD_CFLAGS	+= -fgraphite-identity -ftree-loop-distribution \
+						-floop-interchange -floop-block -floop-strip-mine -ftree-loop-linear \
+						-funswitch-loops -fpredictive-commoning -ffast-math -fgcse-after-reload \
+						-fipa-cp-clone
+#endif
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL := -DTARGET_PRODUCT="$(TARGET_PRODUCT)"
 KBUILD_AFLAGS   := -D__ASSEMBLY__
