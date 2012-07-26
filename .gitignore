@@ -84,3 +84,13 @@ arch/arm/boot/compressed/piggy.gzip
 arch/arm/boot/compressed/vmlinux
 
 arch/arm/boot/compressed/vmlinux.lds
+
+scripts/basic/fixdep
+
+scripts/kconfig/conf
+
+scripts/kconfig/lex.zconf.c
+
+scripts/kconfig/zconf.hash.c
+
+scripts/kconfig/zconf.tab.c
