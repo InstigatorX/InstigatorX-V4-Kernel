@@ -572,7 +572,7 @@ static int dhd_sleep_pm_callback(struct notifier_block *nfb, unsigned long actio
 
 static struct notifier_block dhd_sleep_pm_notifier = {
 	.notifier_call = dhd_sleep_pm_callback,
-	.priority = 0
+	.priority = 10
 };
 extern int register_pm_notifier(struct notifier_block *nb);
 extern int unregister_pm_notifier(struct notifier_block *nb);
@@ -2608,7 +2608,7 @@ int sleep_never = 0;
 static int
 dhd_stop(struct net_device *net)
 {
-	int ifidx;
+	int ifidx = 0;
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(net);
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	DHD_TRACE(("%s: Enter %p\n", __FUNCTION__, net));
@@ -2642,6 +2642,9 @@ dhd_stop(struct net_device *net)
 
 	/* Stop the protocol module */
 	dhd_prot_stop(&dhd->pub);
+	
+	OLD_MOD_DEC_USE_COUNT;
+exit:
 
 #if defined(WL_CFG80211)
 	if (ifidx == 0) {
@@ -2668,8 +2671,7 @@ dhd_stop(struct net_device *net)
 #ifdef BCM4334_CHIP
 	dhd->pub.tx_seqerr_cnt = 0;
 #endif
-	OLD_MOD_DEC_USE_COUNT;
-exit:
+	
 	DHD_OS_WAKE_UNLOCK(&dhd->pub);
 	return 0;
 }
@@ -5223,7 +5225,7 @@ int dhd_os_wake_lock_timeout(dhd_pub_t *pub)
 #ifdef CONFIG_HAS_WAKELOCK
 		if (dhd->wakelock_timeout_enable)
 			wake_lock_timeout(&dhd->wl_rxwake,
-				dhd->wakelock_timeout_enable * HZ / 2);
+				msecs_to_jiffies(dhd->wakelock_timeout_enable));
 #endif
 		dhd->wakelock_timeout_enable = 0;
 		spin_unlock_irqrestore(&dhd->wakelock_spinlock, flags);
