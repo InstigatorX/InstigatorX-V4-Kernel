@@ -195,9 +195,9 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= arm
 
 #ifdef CONFIG_TOOLCHAIN_463
-#	CROSS_COMPILE  ?= /opt/toolchains/arm-linux-androideabi-4.6.3/prebuilt/darwin-x86/bin/arm-linux-androideabi-
+	CROSS_COMPILE  ?= /opt/toolchains/arm-linux-androideabi-4.6.3/prebuilt/darwin-x86/bin/arm-linux-androideabi-
 #else
-	CROSS_COMPILE	?= /opt/toolchains/arm-eabi-4.4.3/bin/arm-eabi-
+#	CROSS_COMPILE	?= /opt/toolchains/arm-eabi-4.4.3/bin/arm-eabi-
 #endif
 
 # Architecture as present in compile.h
