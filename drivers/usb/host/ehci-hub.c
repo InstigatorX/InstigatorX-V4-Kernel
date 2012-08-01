@@ -1289,8 +1289,6 @@ static int ehci_hub_control (
 #endif
 			else
 				goto error;
-<<<<<<< HEAD
-=======
 			ehci_quiesce(ehci);
 
 			/* Put all enabled ports into suspend */
@@ -1307,7 +1305,6 @@ static int ehci_hub_control (
 			temp = ehci_readl(ehci, status_reg);
 			temp |= selector << 16;
 			ehci_writel(ehci, temp, status_reg);
->>>>>>> 00c37d5... USB: EHCI: Fix test mode sequence
 			break;
 
 		default:

@@ -495,6 +495,10 @@ static const struct option_blacklist_info zte_0037_blacklist = {
 	.sendsetup = BIT(0) | BIT(1),
 };
 
+static const struct option_blacklist_info zte_0037_blacklist = {
+	.sendsetup = BIT(0) | BIT(1),
+};
+
 static const struct option_blacklist_info zte_k3765_z_blacklist = {
 	.sendsetup = BIT(0) | BIT(1) | BIT(2),
 	.reserved = BIT(4),
@@ -523,6 +527,10 @@ static const struct option_blacklist_info net_intf5_blacklist = {
 static const struct option_blacklist_info zte_mf626_blacklist = {
 	.sendsetup = BIT(0) | BIT(1),
 	.reserved = BIT(4),
+};
+
+static const struct option_blacklist_info huawei_cdc12_blacklist = {
+	.reserved = BIT(1) | BIT(2),
 };
 
 static const struct usb_device_id option_ids[] = {
