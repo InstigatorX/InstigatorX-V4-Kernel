@@ -116,3 +116,5 @@ scripts/genksyms/genksyms
 scripts/conmakehash
 
 scripts/bin2c
+
+scripts/kconfig/mconf
