@@ -200,11 +200,6 @@ static int proc_root_link(struct inode *inode, struct path *path)
 	return result;
 }
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> c8fec25... proc: clean up and fix /proc/<pid>/mem handling
 static struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 {
 	struct mm_struct *mm;
@@ -216,12 +211,8 @@ static struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 
 	mm = get_task_mm(task);
 	if (mm && mm != current->mm &&
-<<<<<<< HEAD
 			!ptrace_may_access(task, mode) &&
 			!capable(CAP_SYS_RESOURCE)) {
-=======
-			!ptrace_may_access(task, mode)) {
->>>>>>> c8fec25... proc: clean up and fix /proc/<pid>/mem handling
 		mmput(mm);
 		mm = ERR_PTR(-EACCES);
 	}
