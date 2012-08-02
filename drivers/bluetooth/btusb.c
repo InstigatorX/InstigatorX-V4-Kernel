@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
  *
  *  Generic Bluetooth USB driver
@@ -2521,4 +2520,3 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
 MODULE_DESCRIPTION("Generic Bluetooth USB driver ver " VERSION);
 MODULE_VERSION(VERSION);
 MODULE_LICENSE("GPL");
->>>>>>> efb1497... Bluetooth: Add MacBookAir4,1 support
