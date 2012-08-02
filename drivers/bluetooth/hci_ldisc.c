@@ -508,6 +508,56 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
 /*
  * We don't provide read/write/poll interface for user space.
  */
+ 
+struct hci_uart_hook {
+	unsigned int len;
+	unsigned char *head;
+	unsigned char data[HCI_MAX_EVENT_SIZE];
+};
+
+static struct hci_uart_hook *hook;
+static DECLARE_WAIT_QUEUE_HEAD(read_wait);
+
+void hci_uart_tty_read_hook(struct sk_buff *skb)
+{
+	if (!hook) {
+		BT_DBG("%s: hooking wasn't requested, skip it", __func__);
+		goto hci_uart_tty_read_hook_exit;
+	}
+
+	if (bt_cb(skb)->pkt_type != HCI_EVENT_PKT) {
+		BT_DBG("%s: Packet type is %d, skip it", __func__, bt_cb(skb)->pkt_type);
+		goto hci_uart_tty_read_hook_exit;
+	}
+
+	BT_DBG("%s: Received len = %d", __func__, skb->len);
+	if (skb->len > sizeof(hook->data)) {
+		BT_DBG("Packet size exceeds max len, skip it");
+		goto hci_uart_tty_read_hook_exit;
+	}
+
+	memcpy(hook->data, &bt_cb(skb)->pkt_type, 1);
+	skb_copy_from_linear_data(skb, &hook->data[1], skb->len);
+	hook->len = skb->len + 1;
+
+hci_uart_tty_read_hook_exit:
+	wake_up_interruptible(&read_wait);
+}
+EXPORT_SYMBOL(hci_uart_tty_read_hook);
+
+static int hci_uart_tty_access_allowed(void)
+{
+	char name[TASK_COMM_LEN];
+	get_task_comm(name, current_thread_info()->task);
+	BT_DBG("%s: %s", __func__, name);
+	if (strcmp(name, "brcm_poke_helpe")) {
+		BT_ERR("%s isn't allowed", name);
+		return -EACCES;
+	}
+
+	return 0;
+}
+
 static ssize_t hci_uart_tty_read(struct tty_struct *tty, struct file *file,
 					unsigned char __user *buf, size_t nr)
 {
