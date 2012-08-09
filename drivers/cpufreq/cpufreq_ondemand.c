@@ -936,9 +936,19 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 		unsigned int code, int value)
 {
 
+	int i;
+
 #if 1 /* samsung feature */
 	int found = 0;
+#endif
 
+	if ((dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MAXLEVEL) ||
+		(dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MINLEVEL)) {
+		/* nothing to do */
+		return;
+	}
+
+#if 1 /* samsung feature */
 	/* only sec touchevent */
 	if (!strncmp(handle->dev->name,
 			"sec_touchscreen", strlen("sec_touchscreen"))) {
@@ -952,23 +962,20 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 		return;
 #endif
 
-	int i;
-
-	if ((dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MAXLEVEL) ||
-		(dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MINLEVEL)) {
-		/* nothing to do */
-		return;
-	}
-
 	if (current_sampling_rate > BOOSTED_SAMPLING_RATE) {
 		dbs_tuners_ins.sampling_rate = BOOSTED_SAMPLING_RATE;
 		sampling_rate_boosted_time = ktime_to_us(ktime_get());
 		sampling_rate_boosted = 1;
 	}
 
+#if 1 /* applied touch booster to only cpu0 core for power consumption optimization */
+	i = 0;
+	queue_work_on(i, input_wq, &per_cpu(dbs_refresh_work, i));
+#else
 	for_each_online_cpu(i) {
 		queue_work_on(i, input_wq, &per_cpu(dbs_refresh_work, i));
 	}
+#endif
 }
 
 static int dbs_input_connect(struct input_handler *handler,
