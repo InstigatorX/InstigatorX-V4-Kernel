@@ -381,6 +381,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks \
 		   -marm -march=armv7-a -mtune=cortex-a9 \
+		   -mfpu=neon \
 		   -funswitch-loops -fpredictive-commoning \
 		   -fmodulo-sched -fmodulo-sched-allow-regmoves
 
