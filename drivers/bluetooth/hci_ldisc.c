@@ -486,8 +486,6 @@ static void hci_uart_destruct(struct hci_dev *hdev)
 
 	BT_DBG("%s", hdev->name);
 
-	kfree(hdev->driver_data);
-
 }
 
 
@@ -643,7 +641,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
 			}
 
 		}
-
+		kfree(hu);
 	}
 
 }
@@ -1473,5 +1471,3 @@ MODULE_VERSION(VERSION);
 MODULE_LICENSE("GPL");
 
 MODULE_ALIAS_LDISC(N_HCI);
-
->>>>>>> parent of 6bc9874... Bluetooth: uart-ldisc: Fix memory leak
