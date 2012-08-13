@@ -411,7 +411,7 @@ static void __rcu_delimit_batches(struct rcu_list *pending)
         * seemingly unneeded) bonus, keeps this cpu from advancing its insn
         * counter until the results of that xchg are visible on other cpus.
         */
-       (void)xchg(&rcu_which, prev); /* only place where rcu_which is written to */
+       xchg(&rcu_which, prev); /* only place where rcu_which is written to */
 
        rcu_stats.nbatches++;
        rcu_stats.nlast = 0;
