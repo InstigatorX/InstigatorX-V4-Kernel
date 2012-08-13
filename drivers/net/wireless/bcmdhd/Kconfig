@@ -48,3 +48,11 @@ config BROADCOM_WIFI
 	default y
 	---help---
 		This is a configuration for broadcom WLAN driver.
+
+config BCMDHD_WIFI_PM
+	bool "Enable support for changing the WiFi power mode"
+	depends on BROADCOM_WIFI
+	default n
+	help
+	  Enable support for changing the WiFi power mode for
+	  screen-off.
