@@ -614,14 +614,12 @@ module_param(wifi_pm, int, 0755);
 
 static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
-#ifndef CUSTOMER_HW_SAMSUNG
 	int power_mode = PM_MAX;
 	
 	/* wl_pkt_filter_enable_t	enable_parm; */
 	char iovbuf[32];
 	int bcn_li_dtim = 3;
 	uint roamvar = 1;
-#endif
 
 	DHD_ERROR(("%s: enter, value = %d in_suspend=%d\n",
 		__FUNCTION__, value, dhd->in_suspend));
