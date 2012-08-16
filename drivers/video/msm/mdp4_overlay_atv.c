@@ -110,6 +110,7 @@ int mdp4_atv_on(struct platform_device *pdev)
 
 	mdp4_overlay_dmae_xy(pipe);	/* dma_e */
 	mdp4_overlay_dmae_cfg(mfd, 1);
+
 	mdp4_overlay_rgb_setup(pipe);
 
 	mdp4_overlayproc_cfg(pipe);
@@ -182,8 +183,6 @@ void mdp4_atv_overlay(struct msm_fb_data_type *mfd)
 	} else {
 		pipe->srcp0_addr = (uint32)(buf + buf_offset);
 	}
-	mdp4_overlay_mdp_perf_req(pipe, mfd);
-	mdp4_overlay_mdp_perf_upd(mfd, 1);
 	mdp4_overlay_rgb_setup(pipe);
 	mdp4_overlay_reg_flush(pipe, 0);
 	mdp4_mixer_stage_up(pipe);
@@ -202,7 +201,10 @@ void mdp4_atv_overlay(struct msm_fb_data_type *mfd)
 	spin_unlock_irqrestore(&mdp_spin_lock, flag);
 	wait_for_completion_killable(&atv_pipe->comp);
 	mdp_disable_irq(MDP_OVERLAY1_TERM);
-	mdp4_overlay_mdp_perf_upd(mfd, 0);
+
+	/* change mdp clk while mdp is idle` */
+	mdp4_set_perf_level();
+
 	mdp4_stat.kickoff_atv++;
 	mutex_unlock(&mfd->dma->ov_mutex);
 }
