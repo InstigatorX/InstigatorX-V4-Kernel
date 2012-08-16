@@ -115,7 +115,7 @@ static int boost_val;
 /*
  * Early suspend max frequency
  */
-#define DEFAULT_SCREEN_OFF_MAX 702000
+#define DEFAULT_SCREEN_OFF_MAX 594000
 static unsigned long screen_off_max;
 
 static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
