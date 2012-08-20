@@ -299,6 +299,8 @@ struct bfq_queue {
  *                                   (in jiffies)
  * @bfq_raising_max_softrt_rate: max service-rate for a soft real-time queue,
  *			         sectors per seconds
+ * @RT_prod: cached value of the product R*T used for computing the maximum
+ * 	     duration of the weight raising automatically
  * @oom_bfqq: fallback dummy bfqq for extreme OOM conditions
  *
  * All the fields are protected by the @queue lock.
@@ -361,6 +363,7 @@ struct bfq_data {
 	unsigned int bfq_raising_min_idle_time;
 	unsigned int bfq_raising_min_inter_arr_async;
 	unsigned int bfq_raising_max_softrt_rate;
+	u64 RT_prod;
 
 	struct bfq_queue oom_bfqq;
 };
