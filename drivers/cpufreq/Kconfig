@@ -179,6 +179,9 @@ config CPU_FREQ_DEFAULT_GOV_LAGFREE
 	help
 	  Use the CPUFreq governor 'lagfree' as default.
 
+config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
+	bool "pegasusq"
+	select CPU_FREQ_GOV_PEGASUSQ
 
 endchoice
 
@@ -410,6 +413,14 @@ config CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER
 	help
 	  Sampling latency rate multiplied by the cpu switch latency.
 	  Affects governor polling.
+
+config CPU_FREQ_GOV_PEGASUSQ
+	tristate "'pegasusq' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'pegasusq' - a new governor from Samsung tweaked for Siyah
+
+	  If in doubt, say N.
 
 config SEC_DVFS
 	bool "DVFS job"

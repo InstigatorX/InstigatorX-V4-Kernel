@@ -665,7 +665,6 @@ static ssize_t store_cpu_down_rate(struct kobject *a, struct attribute *b,
 	return count;
 }
 
-#ifdef CONFIG_CPU_EXYNOS4210
 static ssize_t store_up_nr_cpus(struct kobject *a, struct attribute *b,
 				const char *buf, size_t count)
 {
@@ -677,7 +676,6 @@ static ssize_t store_up_nr_cpus(struct kobject *a, struct attribute *b,
 	dbs_tuners_ins.up_nr_cpus = min(input, num_possible_cpus());
 	return count;
 }
-#endif
 
 static ssize_t store_max_cpu_lock(struct kobject *a, struct attribute *b,
 				  const char *buf, size_t count)
@@ -862,14 +860,14 @@ static void cpu_down_work(struct work_struct *work)
 	if (hotplug_lock)
 		nr_down = online - hotplug_lock;
 
-	for_each_online_cpu(cpu) {
+/*	for_each_online_cpu(cpu) {
 		if (cpu == 0)
 			continue;
 		printk(KERN_ERR "CPU_DOWN %d\n", cpu);
 		cpu_down(cpu);
 		if (--nr_down == 0)
 			break;
-	}
+	} */
 }
 
 static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
