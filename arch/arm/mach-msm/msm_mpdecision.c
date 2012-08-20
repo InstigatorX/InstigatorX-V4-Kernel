@@ -76,7 +76,16 @@ static unsigned int TwTs_Threshold[4] = {250, 0, 0, 250};
 extern unsigned int get_rq_info(void);
 extern unsigned long acpuclk_8x60_get_rate(int);
 
+/* MPDECISION state values
+ * 0 = no mpdecision except screen aware
+ * 1 = full mpdecision active
+ */
+#ifdef CONFIG_MSM_MPDEC_ENABLED
 unsigned int state = MSM_MPDEC_IDLE;
+#elif defined(CONFIG_MSM_MPDEC_DISABLED)
+unsigned int state = MSM_MPDEC_DISABLED;
+#endif
+
 bool was_paused = false;
 
 static int mp_decision(void)
