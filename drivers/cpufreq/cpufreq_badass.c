@@ -26,6 +26,7 @@
 #include <linux/input.h>
 #include <linux/workqueue.h>
 #include <linux/slab.h>
+#include <linux/earlysuspend.h>
 
 /*
  * bds is used in this file as a shortform for demandbased switching
@@ -42,6 +43,7 @@
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
 #define MIN_FREQUENCY_DOWN_DIFFERENTIAL		(1)
+#define BDS_INPUT_EVENT_MIN_FREQ    (810000)
 
 /* Phase configurables */
 #define MAX_IDLE_COUNTER			160
@@ -187,6 +189,13 @@ static struct bds_tuners {
 	.gpu_busy_clr_threshold = GPU_BUSY_CLR_THRESHOLD,
 #endif
 };
+
+#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
+	!defined(CONFIG_SEC_DVFS_UNI)
+static struct early_suspend cpufreq_gov_early_suspend;
+static unsigned int cpufreq_gov_lcd_status;
+static unsigned long stored_sampling_rate;
+#endif
 
 static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 							cputime64_t *wall)
@@ -557,7 +566,7 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 				for_each_cpu(j, &cpus_timer_done) {
 					if (!bds_info->cur_policy) {
 						printk(KERN_ERR
-						"%s Dbs policy is NULL\n",
+						"%s BDS policy is NULL\n",
 						 __func__);
 						goto skip_this_cpu;
 					}
@@ -588,7 +597,7 @@ skip_this_cpu:
 			for_each_cpu(j, &cpus_timer_done) {
 				if (!bds_info->cur_policy) {
 					printk(KERN_ERR
-					"%s Dbs policy is NULL\n",
+					"%s BDS policy is NULL\n",
 					 __func__);
 					goto skip_this_cpu_bypass;
 				}
@@ -1213,10 +1222,11 @@ static void bds_refresh_callback(struct work_struct *unused)
 		return;
 	}
 
-	if (policy->cur < policy->max) {
-		policy->cur = policy->max;
-
-		__cpufreq_driver_target(policy, policy->max,
+	if (policy->cur < BDS_INPUT_EVENT_MIN_FREQ) {
+		/*
+		pr_info("%s: set cpufreq to BDS_INPUT_EVENT_MIN_FREQ(%d) directly due to input events!\n", __func__, BDS_INPUT_EVENT_MIN_FREQ);
+		*/
+		__cpufreq_driver_target(policy, BDS_INPUT_EVENT_MIN_FREQ,
 					CPUFREQ_RELATION_L);
 		this_bds_info->prev_cpu_idle = get_cpu_idle_time(cpu,
 				&this_bds_info->prev_cpu_wall);
@@ -1224,7 +1234,7 @@ static void bds_refresh_callback(struct work_struct *unused)
 	unlock_policy_rwsem_write(cpu);
 }
 
-static unsigned int enable_bds_input_event;
+static unsigned int enable_bds_input_event = 1;
 static void bds_input_event(struct input_handle *handle, unsigned int type,
 		unsigned int code, int value)
 {
@@ -1244,12 +1254,26 @@ static void bds_input_event(struct input_handle *handle, unsigned int type,
 	}
 }
 
+static int input_dev_filter(const char *input_dev_name)
+{
+	if (strstr(input_dev_name, "touchscreen") || strstr(input_dev_name, "-keypad") ||
+		strstr(input_dev_name, "-nav") || strstr(input_dev_name, "-oj")) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
 static int bds_input_connect(struct input_handler *handler,
 		struct input_dev *dev, const struct input_device_id *id)
 {
 	struct input_handle *handle;
 	int error;
 
+	/* filter out those input_dev that we don't care */
+	if (input_dev_filter(dev->name))
+		return -ENODEV;
+	
 	handle = kzalloc(sizeof(struct input_handle), GFP_KERNEL);
 	if (!handle)
 		return -ENOMEM;
@@ -1403,6 +1427,28 @@ static int cpufreq_governor_bds(struct cpufreq_policy *policy,
 	return 0;
 }
 
+#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
+	!defined(CONFIG_SEC_DVFS_UNI)
+static void cpufreq_gov_suspend(struct early_suspend *h)
+{
+	mutex_lock(&bds_mutex);
+	cpufreq_gov_lcd_status = 0;
+	pr_info("%s : cpufreq_gov_lcd_status %d\n", __func__, cpufreq_gov_lcd_status);
+	stored_sampling_rate = min_sampling_rate;
+	min_sampling_rate = MICRO_FREQUENCY_MIN_SAMPLE_RATE * 6;
+	mutex_unlock(&bds_mutex);
+}
+
+static void cpufreq_gov_resume(struct early_suspend *h)
+{
+	mutex_lock(&bds_mutex);
+	min_sampling_rate = stored_sampling_rate;
+	cpufreq_gov_lcd_status = 1;
+	pr_info("%s : cpufreq_gov_lcd_status %d\n", __func__, cpufreq_gov_lcd_status);
+	mutex_unlock(&bds_mutex);
+}
+#endif
+
 static int __init cpufreq_gov_bds_init(void)
 {
 	cputime64_t wall;
@@ -1437,6 +1483,17 @@ static int __init cpufreq_gov_bds_init(void)
 	for_each_possible_cpu(i) {
 		INIT_WORK(&per_cpu(bds_refresh_work, i), bds_refresh_callback);
 	}
+
+#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
+	!defined(CONFIG_SEC_DVFS_UNI)
+	cpufreq_gov_lcd_status = 1;
+
+	cpufreq_gov_early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
+
+	cpufreq_gov_early_suspend.suspend = cpufreq_gov_suspend;
+	cpufreq_gov_early_suspend.resume = cpufreq_gov_resume;
+	register_early_suspend(&cpufreq_gov_early_suspend);
+#endif
 
 	return cpufreq_register_governor(&cpufreq_gov_badass);
 }
