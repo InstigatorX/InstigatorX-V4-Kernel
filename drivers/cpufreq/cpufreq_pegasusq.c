@@ -862,14 +862,14 @@ static void cpu_down_work(struct work_struct *work)
 	if (hotplug_lock)
 		nr_down = online - hotplug_lock;
 
-/*	for_each_online_cpu(cpu) {
+	for_each_online_cpu(cpu) {
 		if (cpu == 0)
 			continue;
 		printk(KERN_ERR "CPU_DOWN %d\n", cpu);
 		cpu_down(cpu);
 		if (--nr_down == 0)
 			break;
-	} */
+	}
 }
 
 static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
