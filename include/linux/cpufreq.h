@@ -442,12 +442,6 @@ extern struct cpufreq_governor cpufreq_gov_performance;
 #endif
 #ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_performance)
-#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2)
-extern struct cpufreq_governor cpufreq_gov_smartass2;
-#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_smartass2)
-#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_BADASS)
-extern struct cpufreq_governor cpufreq_gov_badass;
-#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_badass)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE)
 extern struct cpufreq_governor cpufreq_gov_powersave;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_powersave)
@@ -463,6 +457,12 @@ extern struct cpufreq_governor cpufreq_gov_conservative;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE)
 extern struct cpufreq_governor cpufreq_gov_interactive;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_interactive)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2)
+extern struct cpufreq_governor cpufreq_gov_smartass2;
+#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_smartass2)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_BADASS)
+extern struct cpufreq_governor cpufreq_gov_badass;
+#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_badass)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVEX)
 extern struct cpufreq_governor cpufreq_gov_interactivex;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_interactivex)
@@ -505,6 +505,9 @@ extern struct cpufreq_governor cpufreq_gov_pegasusq;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_ABYSSPLUG)
 extern struct cpufreq_governor cpufreq_gov_abyssplug;
 #define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_abyssplug)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_SCARY)
+extern struct cpufreq_governor cpufreq_gov_scary;
+#define CPUFREQ_DEFAULT_GOVERNOR  (&cpufreq_gov_scary)
 #endif
 
 

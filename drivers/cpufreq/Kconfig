@@ -228,6 +228,12 @@ config CPU_FREQ_DEFAULT_GOV_AGGRESSIVEX
         This features earlysuspend, hotplugging,
         and tweaks to make it more aggressive.
 
+config CPU_FREQ_DEFAULT_GOV_SCARY
+	bool "aggressive"
+	select CPU_FREQ_GOV_SCARY
+	help
+	A modified ondemand governor.
+        
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -515,6 +521,13 @@ config CPU_FREQ_GOV_AGGRESSIVEX
 	help
 	  'aggressiveX' - this governor is a modified conservative with 
 	   screen-off hotplugging support.
+	   If in doubt, say N.
+	   
+config CPU_FREQ_GOV_SCARY
+	tristate "'scary' governor"
+  depends on CPU_FREQ
+	help
+	  'scary' - this governor is a modified ondemand.
 	   If in doubt, say N.
 
 config SEC_DVFS
