@@ -195,6 +195,38 @@ config CPU_FREQ_DEFAULT_GOV_ABYSSPLUG
 	  support the hotplug governor. If unsure have a look at
 	  the help section of the driver. Fallback governor will be the
 	  performance governor.
+	  
+config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRY
+	bool "gallimaufry"
+	select CPU_FREQ_GOV_GALLIMAUFRY
+	help
+	A modified ondemand governor.
+        This features earlysuspend, hotplugging, a
+        2-phase algo, and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRYX
+	bool "gallimaufryX"
+	select CPU_FREQ_GOV_GALLIMAUFRYX
+	help
+	A modified ondemand governor.
+        This features earlysuspend, hotplugging, a
+        2-phase algo, and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_AGGRESSIVE
+	bool "aggressive"
+	select CPU_FREQ_GOV_AGGRESSIVE
+	help
+	A modified conservative governor.
+        This features earlysuspend, hotplugging,
+        and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_AGGRESSIVEX
+	bool "aggressiveX"
+	select CPU_FREQ_GOV_AGGRESSIVEX
+	help
+	A modified conservative governor.
+        This features earlysuspend, hotplugging,
+        and tweaks to make it more aggressive.
 
 endchoice
 
@@ -454,6 +486,36 @@ config CPU_FREQ_GOV_ABYSSPLUG
 	  'ondemand' instead.
 
 	  If in doubt, say N.
+	  
+config CPU_FREQ_GOV_GALLIMAUFRY
+	tristate "'gallimaufry' governor"
+  depends on CPU_FREQ
+	help
+	  'gallimaufry' - this governor is a modified ondemand.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_GALLIMAUFRYX
+	tristate "'gallimaufryX' governor"
+  depends on CPU_FREQ
+	help
+	  'gallimaufryX' - this governor is a modified ondemand with 
+	   screen-off hotplugging support.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_AGGRESSIVE
+	tristate "'aggressive' governor"
+  depends on CPU_FREQ
+	help
+	  'aggressive' - this governor is a modified conservative.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_AGGRESSIVEX
+	tristate "'aggressiveX' governor"
+  depends on CPU_FREQ
+	help
+	  'aggressiveX' - this governor is a modified conservative with 
+	   screen-off hotplugging support.
+	   If in doubt, say N.
 
 config SEC_DVFS
 	bool "DVFS job"
