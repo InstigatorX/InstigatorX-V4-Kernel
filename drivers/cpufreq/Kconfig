@@ -148,12 +148,6 @@ config CPU_FREQ_DEFAULT_GOV_LAZY
 	help
 	  Use the CPUFreq governor 'lazy' as default.
 
-config CPU_FREQ_DEFAULT_GOV_SMOOTHASS
-	bool "smoothass"
-	select CPU_FREQ_GOV_SMOOTHASS
-	help
-	  Use the CPUFreq governor 'smoothass' as default.
-
 config CPU_FREQ_DEFAULT_GOV_LAGFREE
 	bool "lagfree"
 	select CPU_FREQ_GOV_LAGFREE
@@ -380,11 +374,6 @@ config CPU_FREQ_GOV_BADASS_ALLOW_BYPASS
 	depends on CPU_FREQ_GOV_BADASS_2_PHASE
 	help
 	  'allow_bypass' - This driver adds a bypass to the phases
-
-config CPU_FREQ_GOV_SMOOTHASS
-	tristate "'smoothass' cpufreq policy governor"	
-	help	
-	  'smoothass' - smoothass CPU governor.
 
 config CPU_FREQ_GOV_LAGFREE
 	tristate "'lagfree' cpufreq policy governor"	
