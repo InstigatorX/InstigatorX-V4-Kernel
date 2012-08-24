@@ -171,7 +171,13 @@ config CPU_FREQ_DEFAULT_GOV_AGGRESSIVE
         and tweaks to make it more aggressive.
 
 config CPU_FREQ_DEFAULT_GOV_SCARY
-	bool "aggressive"
+	bool "scary"
+	select CPU_FREQ_GOV_SCARY
+	help
+	A modified ondemand governor.
+
+config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
+	bool "pegasusq"
 	select CPU_FREQ_GOV_SCARY
 	help
 	A modified ondemand governor.
@@ -240,6 +246,12 @@ config CPU_FREQ_GOV_ONDEMAND
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+	  
+config CPU_FREQ_GOV_ONDEMAND_2_PHASE
+	tristate "'2-phase' power-efficiency ondemand algorithm"
+	depends on CPU_FREQ_GOV_ONDEMAND
+	help
+	  '2-phase' - This driver adds a new algo to save power
 
 config CPU_FREQ_GOV_INTERACTIVEX
 	tristate "'interactiveX' cpufreq governor"
@@ -363,6 +375,11 @@ config CPU_FREQ_GOV_LAGFREE
 	tristate "'lagfree' cpufreq policy governor"	
 	help	
 	  'lagfree' - lagfree CPU governor.
+	  
+config CPU_FREQ_GOV_PEGASUSQ
+	tristate "'pegasusq' cpufreq policy governor"	
+	help	
+	  'pegasusq' - CPU governor.
 
 config CPU_FREQ_MIN_TICKS
 	int "Ticks between governor polling interval."
