@@ -518,8 +518,8 @@ static irqreturn_t touchkey_interrupt(int irq, void *dummy)  // ks 79 - threaded
 	#if defined(CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_USA_MODEL_SGH_I577) || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I727) || defined(CONFIG_USA_MODEL_SGH_T989)
 		if(Q1_debug_msg)
 			printk(KERN_DEBUG "[TKEY]touchkey release keycode:%d \n", touchkey_keycode[data[0] & KEYCODE_BIT]);
-		else
-			printk(KERN_DEBUG "[TKEY]release\n");
+		//else
+			//printk(KERN_DEBUG "[TKEY]release\n");
 	#endif
 
 	} else {
@@ -539,8 +539,8 @@ static irqreturn_t touchkey_interrupt(int irq, void *dummy)  // ks 79 - threaded
 		#if defined(CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_USA_MODEL_SGH_I577) || defined (CONFIG_USA_MODEL_SGH_T769) || defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T989)
 			if(Q1_debug_msg)
 				printk(KERN_DEBUG "[TKEY]touchkey press keycode:%d \n", touchkey_keycode[data[0] & KEYCODE_BIT]);
-			else
-				printk(KERN_DEBUG "[TKEY]press\n");
+			//else
+				//printk(KERN_DEBUG "[TKEY]press\n");
 		#endif
 		}
 	}
@@ -1042,7 +1042,7 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 	set_bit(touchkey_keycode[1], input_dev->keybit);
 	set_bit(touchkey_keycode[2], input_dev->keybit);
 #if defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D) \
-|| defined (CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_KOR_MODEL_SHV_E160L) || defined (CONFIG_USA_MODEL_SGH_T769)\ 
+|| defined (CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_KOR_MODEL_SHV_E160L) || defined (CONFIG_USA_MODEL_SGH_T769)\
 || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)\
 || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
 	set_bit(touchkey_keycode[3], input_dev->keybit);
@@ -1073,7 +1073,7 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 		printk(KERN_ERR "%s Can't allocate irq .. %d\n", __FUNCTION__, err);
 		return -EBUSY;
 	}
-#if defined(CONFIG_USA_MODEL_SGH_T989)||defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577)\ 
+#if defined(CONFIG_USA_MODEL_SGH_T989)||defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577)\
 	|| defined(CONFIG_CAN_MODEL_SGH_I577R) || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
     {
       touchkey_auto_calibration(1/*on*/);
@@ -1438,7 +1438,7 @@ static ssize_t touch_led_control(struct device *dev, struct device_attribute *at
 		}
 #if defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)
 		int_data = int_data *0x10;		
-#elif defined(CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D)\ 
+#elif defined(CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D)\
 	|| defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769)
 #if defined(CONFIG_EUR_MODEL_GT_I9210)
 	if (get_hw_rev() >=0x05 )
@@ -1452,7 +1452,7 @@ static ssize_t touch_led_control(struct device *dev, struct device_attribute *at
       {     
 		int_data = int_data *0x10;
 	}
-#elif defined(CONFIG_KOR_MODEL_SHV_E160L)\ 
+#elif defined(CONFIG_KOR_MODEL_SHV_E160L)\
    || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
 		int_data = int_data *0x10;
 #else
