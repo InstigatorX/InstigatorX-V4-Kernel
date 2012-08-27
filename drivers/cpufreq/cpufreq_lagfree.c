@@ -35,11 +35,19 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_UP_THRESHOLD			(50)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(15)
+/*
+ * The definition of 'SAMPLING_LATENCY_MULTIPLIER' and 'MIN_TICKS'
+ * is now excluded from .config (or <<device>>.defconfig)
+ * not to confuse the default governors and cause strange behaviour
+ */
+#define CONFIG_CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER		(1000)
+#define CONFIG_CPU_FREQ_MIN_TICKS		(10)
+
+#define DEF_FREQUENCY_UP_THRESHOLD			(80)
+#define DEF_FREQUENCY_DOWN_THRESHOLD		(35)
 #define FREQ_STEP_DOWN 						(108000)
-#define FREQ_SLEEP_MAX 						(384000)
-#define FREQ_AWAKE_MIN 						(192000)
+#define FREQ_SLEEP_MAX 						(1026000)
+#define FREQ_AWAKE_MIN 						(702000)
 #define FREQ_STEP_UP_SLEEP_PERCENT 			(20)
 
 /*
@@ -61,8 +69,8 @@ unsigned int suspended = 0;
 #define MIN_SAMPLING_RATE			\
 			(def_sampling_rate / MIN_SAMPLING_RATE_RATIO)
 #define MAX_SAMPLING_RATE			(500 * def_sampling_rate)
-#define DEF_SAMPLING_DOWN_FACTOR		(4)
-#define MAX_SAMPLING_DOWN_FACTOR		(10)
+#define DEF_SAMPLING_DOWN_FACTOR		(10)
+#define MAX_SAMPLING_DOWN_FACTOR		(100)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
 
 static void do_dbs_timer(struct work_struct *work);

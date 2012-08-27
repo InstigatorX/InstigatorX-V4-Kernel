@@ -39,6 +39,14 @@
 /******************** Tunable parameters: ********************/
 
 /*
+ * The definition of 'SAMPLING_LATENCY_MULTIPLIER' and 'MIN_TICKS'
+ * is now excluded from .config (or <<device>>.defconfig)
+ * not to confuse the default governors and cause strange behaviour
+ */
+#define CONFIG_CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER		(1000)
+#define CONFIG_CPU_FREQ_MIN_TICKS		(10)
+
+/*
  * The "ideal" frequency to use when awake. The governor will ramp up faster
  * towards the ideal frequency and slower after it has passed it. Similarly,
  * lowering the frequency towards the ideal frequency is faster than below it.
@@ -74,27 +82,27 @@ static unsigned int ramp_down_step;
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-#define DEFAULT_MAX_CPU_LOAD 50
+#define DEFAULT_MAX_CPU_LOAD 80 //50
 static unsigned long max_cpu_load;
 
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-#define DEFAULT_MIN_CPU_LOAD 25
+#define DEFAULT_MIN_CPU_LOAD 35 //25
 static unsigned long min_cpu_load;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp up.
  * Notice we ignore this when we are below the ideal frequency.
  */
-#define DEFAULT_UP_RATE_US 48000;
+#define DEFAULT_UP_RATE_US 44000; //44000
 static unsigned long up_rate_us;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  * Notice we ignore this when we are above the ideal frequency.
  */
-#define DEFAULT_DOWN_RATE_US 99000;
+#define DEFAULT_DOWN_RATE_US 44000; //99000
 static unsigned long down_rate_us;
 
 /*
@@ -167,15 +175,19 @@ static
 struct cpufreq_governor cpufreq_gov_smartass2 = {
 	.name = "smartassV2",
 	.governor = cpufreq_governor_smartass,
-	.max_transition_latency = 10000000,
+	.max_transition_latency = 9000000, //9000000
 	.owner = THIS_MODULE,
 };
 
 inline static void smartass_update_min_max(struct smartass_info_s *this_smartass, struct cpufreq_policy *policy, int suspend) {
 	if (suspend) {
-		this_smartass->ideal_speed = sleep_ideal_freq;
+		this_smartass->ideal_speed = // sleep_ideal_freq; but make sure it obeys the policy min/max
+			policy->max > sleep_ideal_freq ?
+			(sleep_ideal_freq > policy->min ? sleep_ideal_freq : policy->min) : policy->max;
 	} else {
-		this_smartass->ideal_speed = awake_ideal_freq;
+		this_smartass->ideal_speed = // awake_ideal_freq; but make sure it obeys the policy min/max
+			policy->min < awake_ideal_freq ?
+			(awake_ideal_freq < policy->max ? awake_ideal_freq : policy->max) : policy->min;
 	}
 }
 
@@ -862,4 +874,3 @@ module_exit(cpufreq_smartass_exit);
 MODULE_AUTHOR ("Erasmux");
 MODULE_DESCRIPTION ("'cpufreq_smartass2' - A smart cpufreq governor");
 MODULE_LICENSE ("GPL");
-
