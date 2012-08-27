@@ -517,7 +517,7 @@ static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
 			CPUFREQ_RELATION_L : CPUFREQ_RELATION_H);
 }
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
-static int set_two_phase_freq(int cpufreq)
+int set_two_phase_freq(int cpufreq)
 {
 	dbs_tuners_ins.two_phase_freq = cpufreq;
 	return 0;
