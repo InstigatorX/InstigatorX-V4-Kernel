@@ -426,7 +426,7 @@ static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
 	__cpufreq_driver_target(p, freq, dbs_tuners_ins.powersave_bias ?
 			CPUFREQ_RELATION_L : CPUFREQ_RELATION_H);
 }
-static int set_two_phase_freq(int cpufreq)
+int set_two_phase_freq(int cpufreq)
 {
 	dbs_tuners_ins.two_phase_freq = cpufreq;
 	return 0;
