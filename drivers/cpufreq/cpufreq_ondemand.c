@@ -553,7 +553,7 @@ static ssize_t store_boostpulse(struct kobject *kobj, struct attribute *attr,
 }
 
 static struct global_attr boostpulse =
-		__ATTR(boostpulse, 0200, NULL, store_boostpulse);
+		__ATTR(boostpulse, 0664, NULL, store_boostpulse);
 
 define_one_global_rw(sampling_rate);
 define_one_global_rw(io_is_busy);
