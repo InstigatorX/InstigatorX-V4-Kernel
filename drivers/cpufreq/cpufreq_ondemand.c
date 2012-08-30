@@ -25,7 +25,6 @@
 #include <linux/input.h>
 #include <linux/workqueue.h>
 #include <linux/slab.h>
-#include <linux/earlysuspend.h>
 
 /*
  * dbs is used in this file as a shortform for demandbased switching
@@ -149,13 +148,6 @@ static struct dbs_tuners {
 	.powersave_bias = 0,
 	.freq_boost_time = DEFAULT_FREQ_BOOST_TIME,
 };
-
-#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
-	!defined(CONFIG_SEC_DVFS_UNI)
-static struct early_suspend cpufreq_gov_early_suspend;
-static unsigned int cpufreq_gov_lcd_status;
-static unsigned long stored_sampling_rate;
-#endif
 
 static inline cputime64_t get_cpu_idle_time_jiffy(unsigned int cpu,
 							cputime64_t *wall)
@@ -762,32 +754,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	/* Check for frequency increase */
 	if (max_load_freq > dbs_tuners_ins.up_threshold * policy->cur) {
-#if defined (CONFIG_TARGET_LOCALE_USA)
-		/* If switching to max speed, apply sampling_down_factor */
-		if (policy->cur < policy->max) {
-			if (policy->cur < 540000) dbs_freq_increase(policy, 810000);
-			else if (policy->cur < 864000) dbs_freq_increase(policy, 1026000);
-			else {
-				this_dbs_info->rate_mult = dbs_tuners_ins.sampling_down_factor;
-				dbs_freq_increase(policy, policy->max);
-			}
-		}
-		return;
-#else
-#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
-	!defined(CONFIG_SEC_DVFS_UNI)
-		if(!cpufreq_gov_lcd_status) {
-			if (policy->cur < policy->max) {
-				if (policy->cur < 540000) dbs_freq_increase(policy, 810000);
-				else if (policy->cur < 864000) dbs_freq_increase(policy, 1026000);
-				else {
-					this_dbs_info->rate_mult = dbs_tuners_ins.sampling_down_factor;
-					dbs_freq_increase(policy, policy->max);
-				}
-			}
-			return;
-		} else
-#endif
 		/* If switching to max speed, apply sampling_down_factor */
 		if (policy->cur < policy->max) {
 			if (sampling_rate_boosted &&
@@ -802,7 +768,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		}
 		dbs_freq_increase(policy, policy->max);
 		return;
-#endif
 	}
 
 	/* check for frequency boost */
@@ -1165,28 +1130,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 	return 0;
 }
 
-#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
-	!defined(CONFIG_SEC_DVFS_UNI)
-static void cpufreq_gov_suspend(struct early_suspend *h)
-{
-	mutex_lock(&dbs_mutex);
-	cpufreq_gov_lcd_status = 0;
-	pr_info("%s : cpufreq_gov_lcd_status %d\n", __func__, cpufreq_gov_lcd_status);
-	stored_sampling_rate = min_sampling_rate;
-	min_sampling_rate = MICRO_FREQUENCY_MIN_SAMPLE_RATE * 6;
-	mutex_unlock(&dbs_mutex);
-}
-
-static void cpufreq_gov_resume(struct early_suspend *h)
-{
-	mutex_lock(&dbs_mutex);
-	min_sampling_rate = stored_sampling_rate;
-	cpufreq_gov_lcd_status = 1;
-	pr_info("%s : cpufreq_gov_lcd_status %d\n", __func__, cpufreq_gov_lcd_status);
-	mutex_unlock(&dbs_mutex);
-}
-#endif
-
 static int __init cpufreq_gov_dbs_init(void)
 {
 	u64 idle_time;
@@ -1220,17 +1163,6 @@ static int __init cpufreq_gov_dbs_init(void)
 	for_each_possible_cpu(i) {
 		INIT_WORK(&per_cpu(dbs_refresh_work, i), dbs_refresh_callback);
 	}
-
-#if defined(CONFIG_SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ) && defined(CONFIG_HAS_EARLYSUSPEND) && \
-	!defined(CONFIG_SEC_DVFS_UNI)
-	cpufreq_gov_lcd_status = 1;
-
-	cpufreq_gov_early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
-
-	cpufreq_gov_early_suspend.suspend = cpufreq_gov_suspend;
-	cpufreq_gov_early_suspend.resume = cpufreq_gov_resume;
-	register_early_suspend(&cpufreq_gov_early_suspend);
-#endif
 
 	return cpufreq_register_governor(&cpufreq_gov_ondemand);
 }
