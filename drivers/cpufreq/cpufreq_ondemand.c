@@ -575,39 +575,6 @@ skip_this_cpu_bypass:
 	return count;
 }
 
-static void dbs_boost()
-{
-	int i;
-
-	if ((dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MAXLEVEL) ||
-		(dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MINLEVEL)) {
-		/* nothing to do */
-		return;
-	}
-
-	for_each_online_cpu(i) {
-		queue_work_on(i, input_wq, &per_cpu(dbs_refresh_work, i));
-	}
-}
-
-static ssize_t store_boostpulse(struct kobject *kobj, struct attribute *attr,
-						  const char *buf, size_t count)
-{
-	int ret;
-	unsigned long val;
-
-	ret = kstrtoul(buf, 0, &val);
-	if (ret < 0)
-		return ret;
-
-	dbs_boost();
-
-	return count;
-}
-
-static struct global_attr boostpulse =
-		__ATTR(boostpulse, 0664, NULL, store_boostpulse);
-
 define_one_global_rw(sampling_rate);
 define_one_global_rw(io_is_busy);
 define_one_global_rw(up_threshold);
@@ -986,7 +953,17 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 		return;
 #endif
 
-	dbs_boost();
+	int i;
+
+	if ((dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MAXLEVEL) ||
+		(dbs_tuners_ins.powersave_bias == POWERSAVE_BIAS_MINLEVEL)) {
+		/* nothing to do */
+		return;
+	}
+
+	for_each_online_cpu(i) {
+		queue_work_on(i, input_wq, &per_cpu(dbs_refresh_work, i));
+	}
 }
 
 static int dbs_input_connect(struct input_handler *handler,
